@@ -1,0 +1,20 @@
+const MAX_THREADS = 8
+
+def fetch_and_increment(p) returns oldvalue:
+    atomically:
+        oldvalue = !p
+        !p = (!p + 1) % MAX_THREADS
+
+def atomic_load(p) returns value:
+    atomically value = !p
+
+def Lock():
+    result = { .counter: 0, .dispenser: 0 }
+
+def acquire(lk):
+    let my_ticket = fetch_and_increment(?lk->dispenser):
+        while atomic_load(?lk->counter) != my_ticket:
+            pass
+
+def release(lk):
+    fetch_and_increment(?lk->counter)

@@ -1,0 +1,83 @@
+import synch;
+import list;
+
+const NITEMS = 3;
+const NWORKERS = 2;
+
+def swap(p, q):
+    let t = ^p:
+        ^p = ^q; 
+        ^q = t; 
+    ;
+;
+def partition(lo, hi):
+    result = lo;
+    for i in lo..(hi - 1):
+        if a[i] <= a[hi]:
+            swap(&a[result], &a[i]);
+            result = result + 1;
+        ;
+    ;
+    swap(&a[result], &a[hi]); 
+;
+def sortrange(range):
+    let lo = range[0], hi = range[1], pivot = partition(lo, hi):
+        if (pivot - 1) > lo:
+            todo = todo + { (lo, pivot - 1) };
+        ;
+        if (pivot + 1) < hi:
+            todo = todo + { (pivot + 1, hi) };
+        ;
+    ;
+;
+def qsort():
+    while todo != {}:
+        let range = choose(todo):
+            todo = todo - { range };
+            sortrange(range);
+        ;
+    ;
+;
+def worker():
+    let running = True:
+        while running:
+            lock(&mutex);
+            if todo == {}:
+                running = False;
+                unlock(&mutex);
+            else:
+                let range = choose(todo):
+                    todo = todo - { range };
+                    unlock(&mutex);
+                    sortrange(range);
+                ;
+            ;
+        ;
+    ;
+    V(&sema);
+;
+def sorted():
+    result = True;
+    for i in 1..(len(a) - 1):
+        if a[i - 1] > a[i]:
+            result = False;
+        ;
+    ;
+;
+def main(copy):
+    for i in 1..NWORKERS:
+        P(&sema);
+    ;
+    assert sorted();
+    assert list2bag(a) == list2bag(copy);
+;
+
+const values = 1..NITEMS;
+a = [ choose(values) for i in 1..choose(1..NITEMS) ];
+todo = { (0, len(a) - 1) };
+mutex = Lock();
+sema = Semaphore(0);
+for i in 1..NWORKERS:
+    spawn worker();
+;
+spawn main(a);

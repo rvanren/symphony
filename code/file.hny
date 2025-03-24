@@ -1,0 +1,21 @@
+from alloc import malloc
+
+def File(n_files) returns fs:
+    fs = malloc([ [], ] * n_files)
+
+def read(fs, ino, offset) returns result:
+    atomically result = (!fs)[ino][offset] if 0 <= offset < len (!fs)[ino] else None
+
+def write(fs, ino, offset, data) returns result:
+    atomically:
+        let n = len (!fs)[ino]:
+            if 0 <= offset <= n:
+                (!fs)[ino][offset] = data
+            else:
+                (!fs)[ino] += ([ None, ] * (offset - n)) + [data,]
+        result = "ok"
+            
+def delete(fs, ino) returns result:
+    atomically:
+        (!fs)[ino] = []
+        result = "ok"

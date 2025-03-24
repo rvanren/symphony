@@ -1,0 +1,45 @@
+# This program tries to find a solution to the Knight's Tour on
+# a board of WIDTH x HEIGHT squares
+const WIDTH = 5
+const HEIGHT = 5
+
+avail = True                            # indicates move was found
+board = [[ False, ] * HEIGHT,] * WIDTH  # board: False = open, True = visited
+curx = 0     # choose { 0 .. WIDTH - 1 }
+cury = 0     # choose { 0 .. HEIGHT - 1 }
+board[curx][cury] = True                # current position has been visited
+
+print(curx, cury)
+
+# Check if (x, y) is an open position on board b
+def valid(b, x, y) returns success:
+    success = not ((x < 0) or (x >= WIDTH) or (y < 0) or (y >= HEIGHT) or b[x][y])
+
+# Return the set of valid moves from position (x, y) on board b
+def moves(b, x, y) returns valid_moves:
+    valid_moves = {}
+    for dx, dy in { (1, 2), (2, 1) }:
+        if valid(b, x + dx, y + dy): valid_moves |= { (x + dx, y + dy) }
+        if valid(b, x - dx, y + dy): valid_moves |= { (x - dx, y + dy) }
+        if valid(b, x + dx, y - dy): valid_moves |= { (x + dx, y - dy) }
+        if valid(b, x - dx, y - dy): valid_moves |= { (x - dx, y - dy) }
+
+# Try a solution by non-deterministically choosing a series of valid moves.
+# Returns True iff a solution has been found.
+# Keep going as long as moves were available *and* some squares are not visited.
+while avail and any(not board[x][y] for x in {0..WIDTH-1} for y in {0..HEIGHT-1}):
+    # Compute the set of possible moves from the current position
+    let possible_moves = moves(board, curx, cury):
+        # See if there are any possible moves
+        avail = possible_moves != {}
+        if avail:
+            # If there are possible moves, select one and move there
+            curx, cury = choose possible_moves
+            assert not board[curx][cury]
+            # This square is now visited
+            board[curx][cury] = True
+            print(curx, cury)
+# If we get here, avail => all squares have been visited
+if avail:
+    assert all(board[x][y] for x in {0..WIDTH-1} for y in {0..HEIGHT-1})
+    assert False    # Stop trying -- printing one path is enough

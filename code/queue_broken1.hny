@@ -1,0 +1,22 @@
+from synch import Lock, acquire, release
+
+def Queue() returns empty:
+    empty = { .elements: [], .lock: Lock() }
+
+def put(q, v):
+    acquire(?q->lock)
+    q->elements += [v,]
+    release(?q->lock)
+
+
+def get(q) returns next:
+    acquire(?q->lock)
+    if q->elements == []:
+        next = None
+    else:
+        next = q->elements[0]
+    release(?q->lock)
+    acquire(?q->lock)
+    if q->elements != []:
+        del q->elements[0]
+    release(?q->lock)

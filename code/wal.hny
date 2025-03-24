@@ -1,0 +1,21 @@
+from alloc import malloc
+
+const BITS_PER_BLOCK = 3
+
+def new(n_blocks) returns wal:
+    wal = malloc([ None, ] * n_blocks)
+
+def getsize(wal) returns size:
+    size = len !wal
+
+def read(wal, bno) returns block:
+    block = (!wal)[bno]
+
+def write(wal, bno, block):
+    (!wal)[bno] = block
+
+def txbegin(wal, id):
+    pass
+
+def txend(wal, id):
+    pass

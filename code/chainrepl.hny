@@ -1,0 +1,139 @@
+import lists, action
+
+const N = 2
+const VALUES = { "a", "b" }
+
+# Global state: initially each process is "fetal"
+procs = [{ .mode: "fetal", .log: [], .detected: {}, .received: {} },] * N
+
+# Every live processor knows about every other live processor
+invariant all(("add_proc", p) in procs[q].log
+                    for p in {0..N-1} where procs[p].mode == "live"
+                    for q in {0..N-1} where procs[q].mode == "live")
+
+# Logs are consistently ordered
+invariant all((lists.startswith(procs[p].log, procs[q].log) or
+                        lists.startswith(procs[q].log, procs[p].log))
+                    for p in {0..N-1} where procs[p].mode == "live"
+                    for q in {0..N-1} where procs[q].mode == "live")
+
+# If p appears before q in q's log, then q's log is a prefix of p's
+invariant all((lists.index(procs[q].log, ("add_proc", p)) <
+                lists.index(procs[q].log, ("add_proc", q))) =>
+                        lists.startswith(procs[p].log, procs[q].log)
+                    for p in {0..N-1} where procs[p].mode == "live"
+                    for q in {0..N-1} where procs[q].mode == "live")
+
+# Logs do not contain duplicates
+invariant all((x == y) => (i == j) for p in {0..N-1}
+                    for i:x in procs[p].log for j:y in procs[p].log)
+
+# Logs do not contain bad entries
+invariant all((t == "add_proc") => (v in {0..N-1})
+                    for p in {0..N-1} for (t, v) in procs[p].log)
+invariant all((t == "clt_update") => (v in VALUES)
+                    for p in {0..N-1} for (t, v) in procs[p].log)
+
+# get_conf(p) returns the configuration according to process p
+const get_conf = lambda(p): [ q for (t, q) in procs[p].log
+    where (t == "add_proc") and (q not in procs[p].detected) ] end
+
+# is_head(p) returns whether process p thinks it's the head
+const is_head = lambda(p): get_conf(p)[0] == p end
+
+# is_successor(self, p) returns whether self thinks p is its successor
+def is_successor(self, p):
+    let conf = get_conf(self)
+    let me = lists.index(conf, self):
+        result = (me < (len(conf) - 1)) and (p == conf[me + 1])
+
+def do_start(self):
+    procs[self].mode = "live"
+    procs[self].log = [ ("add_proc", self), ]
+
+const start = lambda(): { (do_start, 0) } \
+    if all(procs[p].mode == "fetal" for p in {0..N-1}) else {} end
+
+def do_gotClientUpdate(self, v):
+    procs[self].log += [("clt_update", v),]
+
+const gotClientUpdate = lambda(): { (do_gotClientUpdate, (p, v))
+    for p in {0..N-1}
+      where (procs[p].mode == "live") and is_head(p)
+    for v in VALUES
+      where ("clt_update", v) not in procs[p].log } end
+
+def do_gotJoinRequest(self, p):
+    procs[self].log += [("add_proc", p),]
+
+const gotJoinRequest = lambda(): { (do_gotJoinRequest, (p, q))
+    for p in {0..N-1}
+      where (procs[p].mode == "live") and is_head(p)
+        for q in {0..N-1}
+          where ("add_proc", q) not in procs[p].log } end
+
+def do_sendLog(self, p):
+    procs[p].received |= { procs[self].log }
+
+const sendLog = lambda(): { (do_sendLog, (p, q))
+    for p in {0..N-1}
+      where (procs[p].mode == "live") and is_head(p)
+    for q in {0..N-1}
+      where is_successor(p, q) and (procs[p].log not in procs[q].received)
+  } end
+
+def do_gotLog(self, log):
+    procs[self].mode = "live"
+    procs[self].log = log
+
+const gotLog = lambda(): { (do_gotLog, (p, log))
+    for p in {0..N-1}
+      where (procs[p].mode in { "fetal", "live" })
+    for log in procs[p].received
+      where (len(procs[p].log) < len(log)) and lists.startswith(log, procs[p].log) } end
+
+def do_crash(self):
+    procs[self].mode = "crashed"
+
+# Only live processors can crash, but only if there are more than one.
+# We also prevent processors from crashing once all values are stable
+# otherwise we're always left with a single processor in the end
+def crash():
+    if all(("clt_update", v) in procs[p].log
+                    for p in {0..N-1} where procs[p].mode == "live"
+                    for v in VALUES):
+        result = {}
+    else:
+        result = { (do_crash, p)
+            for p in {0..N-1} where (procs[p].mode == "live") and
+                not all(procs[q].mode != "live"
+                    for q in {0..N-1} where (q != p)) }
+
+def do_detect(self, p):
+    procs[self].detected |= { p }
+
+const detect = lambda(): { (do_detect, (p, q))
+    for p in {0..N-1} where procs[p].mode == "live"
+    for q in {0..N-1} where (procs[q].mode == "crashed") and
+                (q not in procs[p].detected) } end
+
+def run():
+    action.explore({start, gotClientUpdate, gotJoinRequest,
+                    sendLog, gotLog, crash, detect})
+
+    # At the end, the following conditions must hold:
+
+    # Some processor must be live
+    assert any(procs[p].mode == "live" for p in {0..N-1})
+
+    # All live logs must be the same
+    assert all(procs[p].log == procs[q].log
+                        for p in {0..N-1} where procs[p].mode == "live"
+                        for q in {0..N-1} where procs[q].mode == "live")
+
+    # All values must be on all live logs
+    assert all(("clt_update", v) in procs[p].log
+                        for p in {0..N-1} where procs[p].mode == "live"
+                        for v in VALUES)
+
+spawn run()

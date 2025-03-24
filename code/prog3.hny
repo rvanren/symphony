@@ -1,0 +1,8 @@
+x = 0
+
+def f(): x += 1
+
+f()
+f()
+
+finally x == 2

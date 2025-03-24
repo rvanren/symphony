@@ -1,0 +1,15 @@
+count = 0
+done = False
+
+finally count == 2
+
+def handler():
+    count += 1
+    done = True
+
+def main():
+    trap handler()
+    count += 1
+    await done
+
+spawn main()

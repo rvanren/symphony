@@ -1,0 +1,184 @@
+set -e
+SYMPHONY=./symphony
+
+$SYMPHONY --noweb code/triangle.hny
+
+$SYMPHONY --noweb code/prog1.hny
+
+$SYMPHONY --noweb code/prog2.hny
+
+$SYMPHONY --noweb code/Up.hny
+
+$SYMPHONY --noweb code/Upf.hny
+
+$SYMPHONY --noweb code/UpEnter.hny
+
+$SYMPHONY --noweb code/csbarebones.hny
+
+$SYMPHONY --noweb code/cs.hny
+
+$SYMPHONY --noweb code/naiveLock.hny
+
+$SYMPHONY --noweb code/naiveFlags.hny
+
+$SYMPHONY --noweb code/naiveTurn.hny
+
+$SYMPHONY --noweb code/Peterson.hny
+
+$SYMPHONY --noweb code/PetersonBroken.hny
+
+$SYMPHONY --noweb code/csonebit.hny
+
+$SYMPHONY --noweb code/PetersonMethod.hny
+
+$SYMPHONY --noweb code/hanoi.hny
+
+$SYMPHONY --noweb code/clock.hny
+
+$SYMPHONY --noweb code/lock_test1.hny
+
+$SYMPHONY --noweb -mlock=lock_tas code/lock_test1.hny
+
+$SYMPHONY --noweb -mlock=lock_ticket code/lock_test1.hny
+
+$SYMPHONY --noweb -mlock=lock_susp code/lock_test1.hny
+
+$SYMPHONY --noweb -mlock=synch code/lock_test1.hny
+
+$SYMPHONY --noweb -mlock=synchS code/lock_test1.hny
+
+$SYMPHONY --noweb code/UpLock.hny
+
+$SYMPHONY --noweb -msynch=synchS code/UpLock.hny
+
+$SYMPHONY --noweb code/spinlock.hny
+
+$SYMPHONY --noweb code/xy.hny
+
+$SYMPHONY --noweb code/atm.hny
+
+$SYMPHONY --noweb code/queue_test1.hny
+
+$SYMPHONY --noweb code/setobj_test1.hny
+
+$SYMPHONY --noweb -msetobj=setobj_linkedlist code/setobj_test1.hny
+
+$SYMPHONY --noweb -mqueueconc=queue_lock code/queue_test_seq.hny
+
+$SYMPHONY --noweb -mqueueconc=queue_MS code/queue_test_seq.hny
+
+$SYMPHONY --noweb -o queue4.hfa code/queue_btest1.hny
+
+$SYMPHONY --noweb -B queue4.hfa -m queue=queue_lock code/queue_btest1.hny
+
+$SYMPHONY --noweb -o queue4.hfa code/queue_btest1.hny
+
+$SYMPHONY --noweb -B queue4.hfa -m queue=queue_MS code/queue_btest1.hny
+
+$SYMPHONY --noweb -mqueue=queue_broken2 code/queue_btest1.hny
+
+$SYMPHONY --noweb code/rwlock_test1.hny
+
+$SYMPHONY --noweb -mrwlock=rwlock_sbs code/rwlock_test1.hny
+
+$SYMPHONY --noweb -mrwlock=rwlock_cv code/rwlock_test1.hny
+
+$SYMPHONY --noweb -mrwlock=rwlock_cv -msynch=synchS code/rwlock_test1.hny
+
+$SYMPHONY --noweb -mrwlock=rwlock_cv_fair code/rwlock_test1.hny
+
+$SYMPHONY --noweb -mrwlock=rwlock_cv_fair -msynch=synchS code/rwlock_test1.hny
+
+$SYMPHONY --noweb -o rw.hfa -cNOPS=2 code/rwlock_btest.hny
+
+$SYMPHONY --noweb -B rw.hfa -cNOPS=2 -m rwlock=rwlock_sbs code/rwlock_btest.hny
+
+$SYMPHONY --noweb -o rw.hfa -cNOPS=2 code/rwlock_btest.hny
+
+$SYMPHONY --noweb -B rw.hfa -cNOPS=2 -m rwlock=rwlock_cv code/rwlock_btest.hny
+
+$SYMPHONY --noweb -B rw.hfa -cNOPS=2 -m rwlock=rwlock_cv_fair code/rwlock_btest.hny
+
+$SYMPHONY --noweb -B rw.hfa -cNOPS=2 -m rwlock=rwlock_cheat code/rwlock_btest.hny
+
+$SYMPHONY --noweb -mboundedbuffer=boundedbuffer_hoare code/boundedbuffer_test1.hny
+
+$SYMPHONY --noweb -mboundedbuffer=boundedbuffer_hoare -msynch=synchS code/boundedbuffer_test1.hny
+
+$SYMPHONY --noweb code/qsorttest.hny
+
+$SYMPHONY --noweb code/Diners.hny
+
+$SYMPHONY --noweb -msynch=synchS code/Diners.hny
+
+$SYMPHONY --noweb code/DinersCV.hny
+
+$SYMPHONY --noweb -msynch=synchS code/DinersCV.hny
+
+$SYMPHONY --noweb code/DinersAvoid.hny
+
+$SYMPHONY --noweb -msynch=synchS code/DinersAvoid.hny
+
+$SYMPHONY --noweb code/bank.hny
+
+$SYMPHONY --noweb code/counter.hny
+
+$SYMPHONY --noweb code/qbarrier.hny
+
+$SYMPHONY --noweb -msynch=synchS code/qbarrier.hny
+
+$SYMPHONY --noweb code/barrier_test1.hny
+
+$SYMPHONY --noweb code/barrier_test2.hny
+
+$SYMPHONY --noweb -o file.hfa code/file_btest.hny
+
+$SYMPHONY --noweb -B file.hfa -m file=file_inode code/file_btest.hny
+
+$SYMPHONY --noweb code/trap.hny
+
+$SYMPHONY --noweb code/trap2.hny
+
+$SYMPHONY --noweb code/trap3.hny
+
+$SYMPHONY --noweb code/trap4.hny
+
+$SYMPHONY --noweb code/trap5.hny
+
+$SYMPHONY --noweb code/trap6.hny
+
+$SYMPHONY --noweb -msynch=synchS code/trap6.hny
+
+$SYMPHONY --noweb code/hw.hny
+
+$SYMPHONY --noweb code/abptest.hny
+
+$SYMPHONY --noweb code/leader.hny
+
+$SYMPHONY --noweb code/2pc.hny
+
+$SYMPHONY --noweb -o reg.hfa code/abdtest.hny
+
+$SYMPHONY --noweb -B reg.hfa -mregister=abd code/abdtest.hny
+
+$SYMPHONY --noweb -o consensus.hfa code/consensus.hny
+
+$SYMPHONY --noweb -B consensus.hfa code/bosco.hny
+
+$SYMPHONY --noweb -o consensus.hfa -cN=2 code/consensus.hny
+
+$SYMPHONY --noweb -B consensus.hfa code/paxos.hny
+
+$SYMPHONY --noweb -o rsm.hfa code/rsm.hny
+
+$SYMPHONY --noweb -B rsm.hfa code/chain.hny
+
+$SYMPHONY --noweb code/needhamschroeder.hny
+
+$SYMPHONY --noweb -mstack=stack1 code/stacktest.hny
+
+$SYMPHONY --noweb -mstack=stack2 code/stacktest.hny
+
+$SYMPHONY --noweb -mstack=stack3 code/stacktest.hny
+
+$SYMPHONY --noweb -mstack=stack4 code/stacktest.hny

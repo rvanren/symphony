@@ -1,0 +1,24 @@
+import synch;
+
+def BLnew(bound):
+    result = dict{ .lock: Lock(), .count: 0, .bound: bound };
+;
+
+def BLacquire(bl):
+    let blocked = True:
+        while blocked:
+            lock(?bl->lock);
+            if bl->count < bl->bound:
+                bl->count += 1;
+                blocked = False;
+            ;
+            unlock(?bl->lock);
+        ;
+    ;
+;
+
+def BLrelease(bl):
+    lock(?bl->lock);
+    bl->count -= 1;
+    unlock(?bl->lock);
+;

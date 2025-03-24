@@ -1,0 +1,13 @@
+from alloc import malloc
+
+def SetObject() returns object:
+    object = malloc({})
+
+def insert(s, v):
+    atomically !s |= {v}
+
+def remove(s, v):
+    atomically !s -= {v}
+
+def contains(s, v) returns present:
+    atomically present = v in !s

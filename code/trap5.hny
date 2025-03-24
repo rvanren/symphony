@@ -1,0 +1,20 @@
+count = 0
+done = False
+
+finally count == 2
+
+def increment():
+    let prior = setintlevel(True):
+        count += 1
+        setintlevel(prior)
+
+def handler():
+    increment()
+    done = True
+
+def main():
+    trap handler()
+    increment()
+    await done
+
+spawn main()

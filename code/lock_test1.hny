@@ -1,0 +1,21 @@
+import lock
+
+const N = 5
+
+in_cs = 0
+invariant in_cs in { 0, 1 }
+
+thelock = lock.Lock()
+
+def thread():
+    while choose({ False, True }):
+        lock.acquire(?thelock)
+
+        atomically in_cs += 1
+        # Critical section
+        atomically in_cs -= 1
+
+        lock.release(?thelock)
+
+for i in {1..N}:
+    spawn thread()

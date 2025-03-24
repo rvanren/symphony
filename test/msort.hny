@@ -1,0 +1,44 @@
+import list;
+
+const N = 4;
+
+def merge(lower, higher):
+    result = [];
+    let i = 0, j = 0, ll = len(lower), lh = len(higher):
+        while (i < ll) or (j < lh):
+            if (j == lh) or ((i < ll) and (lower[i] < higher[j])):
+                result = result + [lower[i],];
+                i = i + 1;
+            else:
+                result = result + [higher[j],];
+                j = j + 1;
+            ;
+        ;
+    ;
+;
+def mergesort(a):
+    if len(a) <= 1:
+        result = a;
+    else:
+        let half = len(a)/2:
+            result = merge(
+                mergesort(subseq(a, 0, half)),
+                mergesort(subseq(a, half, len(a)))
+            );
+        ;
+    ;
+;
+def sorted(a):
+    result = True;
+    for i in 1..(len(a) - 1):
+        if a[i - 1] > a[i]:
+            result = False;
+        ;
+    ;
+;
+
+const values = 1..N;
+input = [ choose(values) for i in 1..choose(0..N) ];
+output = mergesort(input);
+assert sorted(output);
+assert list2bag(input) == list2bag(output), (input, output);

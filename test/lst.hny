@@ -1,0 +1,60 @@
+import synch;
+import alloc;
+
+def lst_node(v, n):
+    result = rec_alloc();
+    (^result).data = dict{ .lock: Lock(), .value: v };
+    (^result).next = n;
+;
+def lst_new():
+    result = lst_node(-inf, lst_node(inf, NULL));
+;
+def lst_find(lst, v):
+    let before = lst, after = (^before).next:
+        lock(&(^before).data.lock);
+        lock(&(^after).data.lock);
+        while (^after).data.value < v:
+            unlock(&(^before).data.lock);
+            before = after;
+            after = (^before).next;
+            lock(&(^after).data.lock);
+        ;
+        result = (before, after);
+    ;
+;
+def lst_insert(lst, v):
+    let x = lst_find(lst, v), before = x[0], after = x[1]:
+        if (^after).data.value != v:
+            (^before).next = lst_node(v, after);
+        ;
+        unlock(&(^before).data.lock);
+        unlock(&(^after).data.lock);
+    ;
+;
+def lst_remove(lst, v):
+    let x = lst_find(lst, v), before = x[0], after = x[1]:
+        if (^after).data.value == v:
+            (^before).next = (^after).next;
+            unlock(&(^after).data.lock);
+            rec_free(after);
+        else:
+            unlock(&(^after).data.lock);
+        ;
+        unlock(&(^before).data.lock);
+    ;
+;
+
+def lst_contains(lst, v):
+    let n = lst:
+        while (^n).data.value < v:
+            n = (^n).next;
+        ;
+        result = (^n).data.value == v;
+    ;
+;
+
+mylist = lst_new();
+lst_insert(mylist, 3);
+assert lst_contains(mylist, 3);
+lst_remove(mylist, 3);
+assert not lst_contains(mylist, 3);

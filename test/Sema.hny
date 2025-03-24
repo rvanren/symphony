@@ -1,0 +1,16 @@
+# correct mutual exclusion using a binary semaphore
+
+import synch;
+
+def process():
+    while choose({ False, True }):
+        call P&(mysema);
+        @cs: assert atLabel.cs == dict{ nametag(): 1 };
+        call V&(mysema);
+    ;
+;
+mysema = Semaphore(1);
+spawn process(), 0;
+spawn process(), 0;
+spawn process(), 1;
+spawn process(), 1;

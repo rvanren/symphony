@@ -1,0 +1,51 @@
+# split binary semaphore solution to producer/consumer bounded buffer
+
+import synch;
+
+const N = 2;         # size of bounded buffer
+
+def vHat():
+    if (cnt < N) and (pwaiting > 0):
+        pwaiting = pwaiting - 1;
+        V(?psema);
+    elif (cnt > 0) and (cwaiting > 0):
+        cwaiting = cwaiting - 1;
+        V(?csema);
+    else:
+        V(?mutex);
+    ;
+;
+def produce(item):
+    P(?mutex);
+    if cnt == N:
+        pwaiting = pwaiting + 1;
+        vHat();
+        P(?psema);
+    ;
+    # buf[myin] = choose({ 10, 20 });
+    buf[myin] = item;
+    myin = (myin % N) + 1;
+    cnt = cnt + 1;
+    vHat();
+;
+def consume():
+    P(?mutex);
+    if cnt == 0:
+        cwaiting = cwaiting + 1;
+        vHat();
+        P(?csema);
+    ;
+    result = buf[myout];
+    myout = (myout % N) + 1;
+    cnt = cnt - 1;
+    vHat();
+;
+buf = dict{ 0 for x in {1..N} };
+cnt = 0;
+myin = 1;
+myout = 1;
+pwaiting = 0;
+cwaiting = 0;
+mutex = Semaphore(1);
+psema = Semaphore(0);
+csema = Semaphore(0);

@@ -1,0 +1,7 @@
+def thread():
+    while True:
+        # Critical section is here
+        pass
+    
+spawn thread()
+spawn thread()

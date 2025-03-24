@@ -1,0 +1,17 @@
+from lock import Lock, acquire, release
+
+const NTHREADS = 5
+
+thelock = Lock()
+in_cs = 0
+
+def thread():
+    while choose { False, True }:
+        acquire(?thelock)
+        atomically in_cs += 1
+        assert in_cs == 1
+        atomically in_cs -= 1
+        release(?thelock)
+
+for i in {1..NTHREADS}:
+    spawn thread()

@@ -1,0 +1,60 @@
+import synch;
+
+const NSEATS = 2;
+
+seated = {};
+done = {};
+mutex = Lock();
+barbercond = Condition(?mutex);
+customercond = Condition(?mutex);
+
+def barber_sleep():
+    lock(?mutex);
+    while seated == {}:
+        wait(?barbercond);
+    ;
+    result = choose(seated);
+    seated -= { result };
+    unlock(?mutex);
+;
+def barber_finished(customer):
+    lock(?mutex);
+    done |= { customer };
+    notifyAll(?customercond);
+    unlock(?mutex);
+;
+def customer_enter(self):
+    lock(?mutex);
+    if len(seated) == NSEATS:
+        result = False;
+    else:
+        seated |= { self };
+        notify(?barbercond);
+        result = True;
+    ;
+    unlock(?mutex);
+;
+def customer_wait(self):
+    lock(?mutex);
+    while self not in done:
+        wait(?customercond);
+    ;
+    unlock(?mutex);
+;
+
+def barber():
+    let customer = barber_sleep():
+        # barber cuts customer's hair
+        barber_finished(customer);
+    ;
+;
+def customer(self):
+    if customer_enter(self):
+        # customer waits for barber
+        customer_wait(self);
+    ;
+;
+for i in {1..2}:
+    spawn barber();
+    spawn customer(i);
+;

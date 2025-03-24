@@ -1,0 +1,25 @@
+import rwlock
+
+nreaders = nwriters = 0
+invariant ((nreaders >= 0) and (nwriters == 0)) or
+            ((nreaders == 0) and (nwriters == 1))
+
+const NOPS = 4
+
+rw = rwlock.RWlock()
+
+def thread():
+    while choose({ False, True }):
+        if choose({ "read", "write" }) == "read":
+            rwlock.read_acquire(?rw)
+            atomically nreaders += 1
+            atomically nreaders -= 1
+            rwlock.read_release(?rw)
+        else:                       # write
+            rwlock.write_acquire(?rw)
+            atomically nwriters += 1
+            atomically nwriters -= 1
+            rwlock.write_release(?rw)
+
+for i in {1..NOPS}:
+    spawn thread()

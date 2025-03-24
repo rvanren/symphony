@@ -1,0 +1,24 @@
+from synch import *
+
+def Pool(nlanes):
+    result = {
+        .mutex: Lock(),
+        .condition: [ Condition(), Condition() ],
+        .count: [ 0, 0 ],
+        .nlanes: nlanes
+    }
+
+def enter(pool, level):
+    acquire(?pool->mutex)
+    while (pool->count[1 - level] > 0) or (pool->count[level] == pool->nlanes):
+        wait(?pool->condition[level], ?pool->mutex)
+    pool->count[level] += 1
+    release(?pool->mutex)
+
+def exit(pool, level):
+    acquire(?pool->mutex)
+    notify(?pool->condition[level])
+    pool->count[level] -= 1
+    if pool->count[level] == 0:
+        notifyAll(?pool->condition[1 - level])
+    release(?pool->mutex)

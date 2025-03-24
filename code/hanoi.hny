@@ -1,0 +1,10 @@
+current = [ [1, 2, 3], [], [] ]
+
+while current[2] != [1, 2, 3]:
+    let moves = { (s, d) for s in {0..2} for d in {0..2}
+        where current[s] != []
+        where (current[d] == []) or (current[s][0] < current[d][0]) }
+    let (src,dst) = choose moves:
+        print str(src) + " -> " + str(dst)
+        current[dst] = [current[src][0],] + current[dst]
+        del current[src][0]

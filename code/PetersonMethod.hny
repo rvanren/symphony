@@ -1,0 +1,31 @@
+def Peterson_enter(pm, pid):
+    pm->flags[pid] = True
+    pm->turn = 1 - pid
+    await (not pm->flags[1 - pid]) or (pm->turn == pid)
+
+def Peterson_exit(pm, pid):
+    pm->flags[pid] = False
+
+def Peterson_mutex() returns result:
+    result = { .turn: choose({0, 1}), .flags: [ False, False ] }
+
+#### The code above can go into its own Symphony module ####
+
+in_cs = 0
+invariant in_cs in { 0, 1 }
+
+sequential mutex
+mutex = Peterson_mutex()
+
+def thread(self):
+    while choose({ False, True }):
+        Peterson_enter(?mutex, self)
+
+        atomically in_cs += 1
+        # Critical section
+        atomically in_cs -= 1
+
+        Peterson_exit(?mutex, self)
+
+spawn thread(0)
+spawn thread(1)

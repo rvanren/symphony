@@ -1,0 +1,7 @@
+x = True
+
+def f(): assert x
+def g(): x = False
+
+spawn f()
+spawn g()

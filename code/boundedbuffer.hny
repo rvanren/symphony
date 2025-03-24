@@ -1,0 +1,11 @@
+def BoundedBuffer(size) returns buffer:
+    buffer = { .buffer: [], .size: size }
+
+def put(bb, v):
+    atomically when len(bb->buffer) < bb->size:
+        bb->buffer += [v,]
+
+def get(bb) returns next:
+    atomically when bb->buffer != []:
+        next = bb->buffer[0]
+        del bb->buffer[0]

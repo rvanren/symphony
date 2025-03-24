@@ -1,0 +1,15 @@
+# Peterson's algorithm
+
+def process(self):
+    while True:
+        flags[self] = True;
+        turn = 1 - self;
+        await (not flags[1 - self]) or (turn == self);
+        @cs: assert (not (flags[1 - self])) or (turn == self);
+        flags[self] = False;
+    ;
+;
+flags = [ False, False ];
+turn = 0;
+spawn process(0), 0;
+spawn process(1), 1;

@@ -1,0 +1,27 @@
+import rwlock
+
+const NOPS = 3
+
+rw = rwlock.RWlock()
+
+def thread(self):
+    while choose({ False, True }):
+        if choose({ "read", "write" }) == "read":
+            print(self, "enter ra")
+            rwlock.read_acquire(?rw)
+            print(self, "exit ra")
+
+            print(self, "enter rr")
+            rwlock.read_release(?rw)
+            print(self, "exit rr")
+        else:                       # write
+            print(self, "enter wa")
+            rwlock.write_acquire(?rw)
+            print(self, "exit wa")
+
+            print(self, "enter wr")
+            rwlock.write_release(?rw)
+            print(self, "enter wr")
+
+for i in {1..NOPS}:
+    spawn thread(i)

@@ -1,0 +1,10 @@
+def Queue():
+    result = []
+
+def put(q, v):
+    atomically !q += [v,]
+
+def get(q):
+    atomically when !q != []:
+        result = (!q)[0]
+        del (!q)[0]

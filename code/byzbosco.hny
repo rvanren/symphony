@@ -1,0 +1,41 @@
+import bags
+
+const F = 1
+const N = (5 * F) + 1
+const NROUNDS = 2
+
+network = bags.empty()
+decisions = {}
+
+def broadcast(msg):
+    atomically network = bags.add(network, msg)
+
+def receive(round, k):
+    let msgs = { e:c for (r,e):c in network where r == round }:
+        result = bags.combinations(msgs, k)
+
+def process(_proposal):
+    var proposal = _proposal
+    broadcast(0, proposal)
+    for round in {0..NROUNDS-1}:
+        atomically when exists quorum in receive(round, N - F):
+            let count = [ bags.multiplicity(quorum, i) for i in { 0..1 } ]:
+                assert count[0] != count[1]
+                proposal = 0 if count[0] > count[1] else 1
+                if count[proposal] == (N - F):
+                    decisions |= { proposal }
+                    assert len(decisions) <= 1
+                broadcast(round + 1, proposal)
+
+def adversary():
+    broadcast(0, 0)
+    broadcast(0, 1)
+    for round in {0..NROUNDS-1}:
+        atomically when exists quorum in receive(round, N - F):
+            broadcast(round + 1, 0)
+            broadcast(round + 1, 1)
+
+for i in {1..N - F}:
+    spawn process(choose({ 0, 1 }))
+for i in {1..F}:
+    spawn adversary()

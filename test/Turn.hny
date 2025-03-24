@@ -1,0 +1,17 @@
+def p(self):
+    while choose({ False, True }):
+        @ncs: pass;
+
+        # Enter critical section
+        await turn == self;
+
+        # Critical section
+        @cs: assert atLabel.cs == dict{ nametag(): 1 };
+
+        # Leave critical section
+        turn = 1 - self;
+    ;
+;
+turn = 0;
+spawn p(0), 0;
+spawn p(1), 1;

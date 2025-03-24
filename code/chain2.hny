@@ -1,0 +1,40 @@
+def replica(self, immortal):        # replica 'self'
+    if not immortal:        # if not immortal, crash sometime
+        trap crash(self)
+
+    var received  = {}              # messages received
+    var requests  = {}              # client requests received
+    var config    = {1..NREPLICAS}  # servers in chain configuration
+    var hist      = []              # history of client requests
+    var delivered = 0               # number requests delivered
+
+    while True:
+        atomically when exists (src, payload) in receive(self) - received:
+            received |= { (src, payload ) }     # don't handle twice
+            if src == "client":                 # received a client request
+                requests |= { payload }
+            elif payload == "crash":            # a server crashed
+                config -= { src }               # remove from configuration
+            elif (self != min(config)) and is_prefix(hist, payload):
+                hist = payload    # received better hist from predecessor
+
+            if self == min(config):     # I'm the head
+                for update in requests where update not in hist:
+                    hist += [update,]
+            if self == max(config):     # I'm the tail, deliver updates
+                while delivered < len(hist):
+                    print(self, hist[delivered])
+                    delivered += 1
+            else:                  # Not tail: send hist to successor
+                let successor = min(i for i in config where i > self):
+                    send(self, successor, hist)
+
+def client(self):
+    print(self)
+    broadcast("client", self)
+
+let immortal = choose {1..NREPLICAS}:
+    for i in {1..NREPLICAS}:
+        spawn eternal replica(i, i == immortal)
+for i in {1..NOPS}:
+    spawn client(i)

@@ -1,0 +1,31 @@
+const NUM_THREADS = 3
+const MAX_ROUNDS = 2
+
+in_cs = 0
+invariant in_cs in { 0, 1 }
+
+sequential entering, number
+
+entering = [False,] * NUM_THREADS
+number = [0,] * NUM_THREADS
+
+def lock(i):
+    entering[i] = True
+    number[i] = max(number) + 1
+    entering[i] = False
+    for j in {0 .. NUM_THREADS - 1}:
+        await not entering[j]
+        await (number[j] == 0) or ((number[j], j) >= (number[i], i))
+
+def unlock(i):
+    number[i] = 0
+
+def process(self):
+    for i in {1 .. choose { 0 .. MAX_ROUNDS } }:
+        lock(self)
+        atomically in_cs += 1
+        atomically in_cs -= 1
+        unlock(self)
+
+for i in {0 .. NUM_THREADS - 1}:
+    spawn process(i)

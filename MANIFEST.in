@@ -1,0 +1,8 @@
+include symphony_model_checker/modules/*.hny
+include symphony_model_checker/charm/*.h
+include symphony_model_checker/charm/*.c
+include symphony_model_checker/charm/python_ext/ext.c
+include symphony_model_checker/charm/iface/*.c
+include symphony_model_checker/charm/iface/*.h
+include symphony_model_checker/symphony/charm.js
+include symphony_model_checker/symphony/charm.css

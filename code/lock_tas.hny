@@ -1,0 +1,17 @@
+def test_and_set(s) returns oldvalue:
+    atomically:
+        oldvalue = !s
+        !s = True
+
+def atomic_store(p, v):
+    atomically !p = v
+
+def Lock() returns initvalue:
+    initvalue = False
+
+def acquire(lk):
+    while test_and_set(lk):
+        pass
+
+def release(lk):
+    atomic_store(lk, False)
